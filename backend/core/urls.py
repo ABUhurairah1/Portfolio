@@ -28,6 +28,7 @@ urlpatterns = [
     path('admin_pannel/', include('admin_pannel.urls')),
     path('clients/', include('clients.urls')),
     path('projects/', include('projects.urls')),
+    path('portfolio/', include('portfolio.urls')),
     # JWT auth endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
