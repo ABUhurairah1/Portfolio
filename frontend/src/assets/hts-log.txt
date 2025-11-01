@@ -1,0 +1,12 @@
+HTTrack3.49-2+htsswf+htsjava launched on Sat, 26 Jul 2025 19:36:04 at https://zen-g-seven.vercel.app/home-vertical.html +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" https://zen-g-seven.vercel.app/home-vertical.html -O1 "D:\Hurairah office Data\MyPortfolio\Theme 2" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+19:37:29	Error: 	"Not Found" (404) at link https://zen-g-seven.vercel.app/font/Nasalization (from https://zen-g-seven.vercel.app/font/fonts.css)
+
+HTTrack Website Copier/3.49-2 mirror complete in 1 minutes 26 seconds : 96 links scanned, 94 files written (60950628 bytes overall) [58971425 bytes received at 685714 bytes/sec], 2454679 bytes transferred using HTTP compression in 45 files, ratio 17%
+(1 errors, 0 warnings, 0 messages)
