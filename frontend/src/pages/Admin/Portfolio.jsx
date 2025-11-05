@@ -147,15 +147,14 @@ const Portfolio = () => {
           projects_completed: "1000",
           email: "",
           location: "",
+          cv: null,
         };
       case "resume":
         return { type: "", role: "", organization: "", period: "", order: 0 };
       case "service":
         return {
-          number: "",
           title: "",
           image: null,
-          description: "",
           order: 0,
           is_active: true,
         };

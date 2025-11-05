@@ -3,7 +3,6 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 
 const ServiceTableHeader = () => (
   <tr>
-    <th>Number</th>
     <th>Title</th>
     <th>Status</th>
     <th>Actions</th>
@@ -14,7 +13,6 @@ const ServiceTableRows = ({ data, onEdit, onDelete }) => (
   <>
     {data.map((item) => (
       <tr key={item.id}>
-        <td>{item.number}</td>
         <td>{item.title}</td>
         <td>{item.is_active ? "Active" : "Inactive"}</td>
         <td>

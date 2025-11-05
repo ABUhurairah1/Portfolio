@@ -9,3 +9,9 @@ export * from './skill';
 export * from './testimonial';
 export * from './socialMedia';
 
+// Project APIs
+export * from './project';
+
+// Plan APIs
+export * from './plan';
+

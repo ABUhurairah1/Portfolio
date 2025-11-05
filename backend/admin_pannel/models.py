@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 
 class UserManager(BaseUserManager):
@@ -16,6 +16,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password=None, username=None, **extra_fields):
         extra_fields.setdefault('is_admin', True)
+        extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_active', True)
         
         if not username:
@@ -24,14 +25,18 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_admin') is not True:
             raise ValueError('Superuser must have is_admin=True.')
         
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        
         return self.create_user(email, password, username, **extra_fields)
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, max_length=255)
     username = models.CharField(max_length=150, blank=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -48,5 +53,5 @@ class User(AbstractBaseUser):
         return self.email
 
     @property
-    def is_staff(self):
+    def is_superuser(self):
         return self.is_admin

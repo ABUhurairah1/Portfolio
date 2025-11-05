@@ -171,7 +171,7 @@ gsap.registerPlugin(ScrollTrigger);
 
         document
           .querySelectorAll(".element:not(:last-child)")
-          .forEach((element, index) => {
+          .forEach((element) => {
             const tabHeight = element.offsetHeight;
             totalHeight -= tabHeight;
 
@@ -269,11 +269,162 @@ gsap.registerPlugin(ScrollTrigger);
     }
   };
 
-  $(function () {
+  /* initializePortfolioAnimations - Targeted function for portfolio section only
+  -------------------------------------------------------------------------*/
+  var initializePortfolioAnimations = function (container) {
+    if (!container) return;
+
+    const $container = $(container);
+    
+    // Only initialize split-text animations within this container
+    const splitTexts = $container.find(".split-text");
+    if (splitTexts.length > 0) {
+      splitTexts.each(function (index, el) {
+        const $el = $(el);
+        // Skip if already initialized (has ScrollTrigger data)
+        if ($el.data("scrollTrigger-initialized")) return;
+
+        const $target = $el.find("p, a").length > 0 ? $el.find("p, a")[0] : el;
+        const hasClass = $el.hasClass.bind($el);
+        
+        try {
+          gsap.registerPlugin(SplitText, ScrollTrigger);
+          const pxl_split = new SplitText($target, {
+            type: "words, chars",
+            lineThreshold: 0.5,
+            linesClass: "split-line",
+          });
+          let split_type_set = pxl_split.chars;
+          gsap.set($target, { perspective: 400 });
+
+          if (hasClass("effect-blur-fade")) {
+            pxl_split.split({ type: "words" });
+            split_type_set = pxl_split.words;
+            
+            // Set initial state explicitly to prevent visible blur
+            gsap.set(split_type_set, {
+              opacity: 0,
+              filter: "blur(10px)",
+              y: 20,
+            });
+            
+            // Check if element is already in viewport when initializing
+            const targetElement = $target[0];
+            const rect = targetElement.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const triggerPoint = windowHeight * 0.95; // Match the start trigger point
+            const isAlreadyInView = rect.top < triggerPoint && rect.bottom > 0;
+            
+            // Create animation with more space at top (95% instead of 86%)
+            gsap.to(split_type_set, {
+              opacity: 1,
+              filter: "blur(0px)",
+              y: 0,
+              duration: 1,
+              stagger: 0.1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: $target,
+                start: "top 95%", // More space at top - triggers earlier
+                toggleActions: "play none none reverse",
+              },
+            });
+            
+            // Store split words reference for potential manual animation
+            $el.data("split-words", split_type_set);
+            
+            // If element is already in view, play animation immediately after ScrollTrigger initializes
+            if (isAlreadyInView) {
+              setTimeout(() => {
+                ScrollTrigger.refresh();
+                // Manually progress the animation to completion
+                gsap.to(split_type_set, {
+                  opacity: 1,
+                  filter: "blur(0px)",
+                  y: 0,
+                  duration: 0.8,
+                  stagger: 0.05,
+                  ease: "power3.out",
+                  overwrite: true,
+                });
+              }, 100);
+            }
+          }
+          
+          // Mark as initialized
+          $el.data("scrollTrigger-initialized", true);
+        } catch (e) {
+          console.warn("Error initializing portfolio text animation:", e);
+        }
+      });
+    }
+
+    // Initialize stackElement only if this container has stack-element class
+    if ($container.hasClass("stack-element")) {
+      const tabsWrap = $container.find(".tabs-content-wrap");
+      if (tabsWrap.length > 0) {
+        // Only initialize if not already initialized
+        if (!$container.data("stack-initialized")) {
+          const headerHeight =
+            document.querySelector(".header-fixed")?.offsetHeight || 0;
+          let totalHeight = tabsWrap.outerHeight();
+          const scrollTriggerInstances = [];
+
+          $container.find(".element:not(:last-child)").each(function () {
+            const element = this;
+            const tabHeight = element.offsetHeight;
+            totalHeight -= tabHeight;
+
+            const pinTrigger = ScrollTrigger.create({
+              trigger: element,
+              scrub: 1,
+              start: `top+=-${headerHeight} top`,
+              end: `+=${totalHeight}`,
+              pin: true,
+              pinSpacing: false,
+              animation: gsap.to(element, {
+                scale: 0.7,
+                opacity: 0,
+              }),
+            });
+
+            scrollTriggerInstances.push(pinTrigger);
+          });
+
+          $container.data("stack-initialized", true);
+          $container.data("scrollTrigger-instances", scrollTriggerInstances);
+        }
+      }
+    }
+
+    // Refresh ScrollTrigger for this section only
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+  };
+
+  // Expose functions globally for React components to use
+  window.initAnimations = function () {
+    // Refresh ScrollTrigger to recalculate positions
+    ScrollTrigger.refresh();
+    
+    // Re-run animation functions to catch new elements
     animation_text();
     scrolling_effect();
     stackElement();
     animationFooter();
     scrollTransform();
+  };
+
+  // Expose portfolio-specific initialization
+  window.initializePortfolioAnimations = initializePortfolioAnimations;
+
+  $(function () {
+    window.initAnimations();
   });
+
+  // Also expose individual functions if needed
+  window.animation_text = animation_text;
+  window.scrolling_effect = scrolling_effect;
+  window.stackElement = stackElement;
 })(jQuery);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { FaPlus } from "react-icons/fa";
 
 const AboutForm = ({ formData, setFormData, rotatingTitleInput, setRotatingTitleInput }) => {
@@ -19,6 +19,13 @@ const AboutForm = ({ formData, setFormData, rotatingTitleInput, setRotatingTitle
       ...formData,
       rotating_titles: currentTitles.filter((_, i) => i !== index),
     });
+  };
+
+  const handleCvChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, cv: file });
+    }
   };
 
   return (
@@ -196,6 +203,20 @@ const AboutForm = ({ formData, setFormData, rotatingTitleInput, setRotatingTitle
           }
           required
         />
+      </div>
+      <div className="admin-form-group">
+        <label className="admin-form-label">CV/Resume</label>
+        <input
+          type="file"
+          className="admin-form-input"
+          onChange={handleCvChange}
+          accept=".pdf,application/pdf"
+        />
+        {formData.cv && typeof formData.cv === 'string' && (
+          <p style={{ marginTop: '8px', color: 'var(--Text-muted)' }}>
+            Current: {formData.cv}
+          </p>
+        )}
       </div>
     </>
   );

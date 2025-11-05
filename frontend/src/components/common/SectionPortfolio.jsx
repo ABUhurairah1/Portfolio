@@ -414,6 +414,7 @@ const PortfolioModal = ({ item, isOpen, onClose }) => {
 const SectionPortfolio = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const portfolioRef = useRef(null);
 
   const handleItemClick = (item) => {
     setSelectedItem(item);
@@ -436,9 +437,118 @@ const SectionPortfolio = () => {
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isModalOpen]);
 
+  // Initialize animations when component mounts and when it comes into view
+  useEffect(() => {
+    const portfolioSection = portfolioRef.current;
+    if (!portfolioSection) return;
+
+    let initialized = false;
+
+    // Function to initialize animations ONLY for portfolio section
+    const initializePortfolioAnimations = () => {
+      if (initialized) return; // Prevent multiple initializations
+      
+      if (typeof window !== "undefined" && window.initializePortfolioAnimations) {
+        // Use requestAnimationFrame to ensure DOM is ready
+        requestAnimationFrame(() => {
+          window.initializePortfolioAnimations(portfolioSection);
+          
+          // After initialization, check and fix heading blur if already in view
+          setTimeout(() => {
+            if (typeof ScrollTrigger !== "undefined" && typeof gsap !== "undefined") {
+              ScrollTrigger.refresh();
+              
+              // Find heading and check if it needs immediate animation
+              const heading = portfolioSection.querySelector(".split-text.effect-blur-fade");
+              if (heading) {
+                const rect = heading.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                const triggerPoint = windowHeight * 0.95; // Match GSAP trigger point
+                
+                // If heading is already past trigger point, animate immediately
+                if (rect.top < triggerPoint && rect.bottom > 0) {
+                  // Try to get word elements from jQuery data if available
+                  let wordElements = null;
+                  if (typeof window !== "undefined" && window.$) {
+                    const $heading = window.$(heading);
+                    wordElements = $heading.data("split-words");
+                  }
+                  
+                  // If not available from data, try finding them in DOM
+                  if (!wordElements || wordElements.length === 0) {
+                    // SplitText typically wraps words in spans or divs
+                    wordElements = Array.from(heading.querySelectorAll("span, div"));
+                    // Filter to likely word elements (those with text content)
+                    wordElements = wordElements.filter(el => 
+                      el.textContent && el.textContent.trim().length > 0 && 
+                      el.textContent.trim().length < 50 // Likely a word, not a full sentence
+                    );
+                  }
+                  
+                  if (wordElements && wordElements.length > 0) {
+                    // Convert jQuery objects to plain arrays if needed
+                    const elementsArray = Array.isArray(wordElements) 
+                      ? wordElements 
+                      : Array.from(wordElements);
+                    
+                    gsap.to(elementsArray, {
+                      opacity: 1,
+                      filter: "blur(0px)",
+                      y: 0,
+                      duration: 0.8,
+                      stagger: 0.05,
+                      ease: "power3.out",
+                      overwrite: true,
+                    });
+                  }
+                }
+              }
+            }
+          }, 150);
+          
+          initialized = true;
+        });
+      }
+    };
+
+    // Use Intersection Observer to detect when section enters viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !initialized) {
+            // Initialize animations when section is visible
+            initializePortfolioAnimations();
+            // Disconnect after first initialization to avoid re-running
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the section is visible
+        rootMargin: "100px 0px 0px 0px", // More space at top to trigger earlier
+      }
+    );
+
+    observer.observe(portfolioSection);
+
+    // Also initialize after a short delay as fallback if section is already visible
+    const timeoutId = setTimeout(() => {
+      if (!initialized) {
+        initializePortfolioAnimations();
+        observer.disconnect();
+      }
+    }, 500);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   return (
     <>
       <div
+        ref={portfolioRef}
         id="portfolio"
         className="section-portfolio spacing-1 stack-element section"
       >

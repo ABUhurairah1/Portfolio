@@ -1,38 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import smallCometWebp from "../../assets/images/item/small-comet.webp";
-// avatars optional for now
-const testimonials = [
-  {
-    id: 1,
-    quote:
-      "ZenG delivered exceptional work. He's professional, fast, and extremely easy to work with. I'd definitely hire him again for future projects!",
-    name: "Lincoln Press",
-    title: "CEO Themesfalt",
-  },
-  {
-    id: 2,
-    quote:
-      "ZenG managed our project with impressive efficiency and clarity. Deadlines were met, communication was smooth, and the outcome was exactly what we hoped for.",
-    name: "Cheyenne Mango",
-    title: "CEO Themesfalt",
-  },
-  {
-    id: 3,
-    quote:
-      "We were blown away by the project quality and turnaround time. Highly recommended for any high-end AI work.",
-    name: "Morgan Stanford",
-    title: "CTO FinTech Labs",
-  },
-  {
-    id: 4,
-    quote:
-      "The best freelancer we ever worked with. Super organized and creative!",
-    name: "Nikita Varga",
-    title: "Product Manager BrightPath",
-  },
-];
+import { getTestimonialList } from "../../apis";
 
 const SectionTestimonial = () => {
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
   const swiperInstanceRef = useRef(null);
   const prevButtonRef = useRef(null);
@@ -60,7 +32,39 @@ const SectionTestimonial = () => {
   };
 
   useEffect(() => {
-    // Wait for Swiper to be available (loaded via script tag)
+    const fetchTestimonials = async () => {
+      try {
+        const response = await getTestimonialList();
+        if (response.success && response.data) {
+          setTestimonials(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch testimonials:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  useEffect(() => {
+    // Wait for Swiper to be available (loaded via script tag) and testimonials to be loaded
+    if (loading || testimonials.length === 0) {
+      // Clean up existing swiper if testimonials are cleared
+      if (swiperInstanceRef.current) {
+        swiperInstanceRef.current.destroy(true, true);
+        swiperInstanceRef.current = null;
+      }
+      return;
+    }
+
+    // Destroy existing swiper instance if it exists
+    if (swiperInstanceRef.current) {
+      swiperInstanceRef.current.destroy(true, true);
+      swiperInstanceRef.current = null;
+    }
+
     let retryCount = 0;
     const maxRetries = 50; // 5 seconds max wait
 
@@ -122,7 +126,7 @@ const SectionTestimonial = () => {
         swiperInstanceRef.current = null;
       }
     };
-  }, []);
+  }, [loading, testimonials]);
 
   return (
     <div
@@ -138,46 +142,52 @@ const SectionTestimonial = () => {
           Trusted By Clients
         </h3>
       </div>
-      <div className="swiper sw-single">
-        <div className="swiper-wrapper">
-          {testimonials.map((t) => (
-            <div className="swiper-slide" key={t.id}>
-              <div className="testimonial-item area-effect">
-                <div className="icon">
-                  <i className="icon-quote"></i>
-                </div>
-                <p className="text-body-2 text_white mb_21">{t.quote}</p>
-                <div className="athor">
-                  <h5 className="name text_white mb_4 font-4">
-                    <a href="#" className="link">
-                      {t.name}
-                    </a>
-                  </h5>
-                  <span className="text-label text-uppercase text_primary-color font-3">
-                    {t.title}
-                  </span>
-                </div>
-                <div className="item-shape spotlight">
-                  <img
-                    src={smallCometWebp}
-                    loading="lazy"
-                    decoding="async"
-                    alt="item"
-                  />
+      {loading || testimonials.length === 0 ? (
+        <div className="swiper sw-single">
+          <div className="swiper-wrapper"></div>
+        </div>
+      ) : (
+        <div className="swiper sw-single">
+          <div className="swiper-wrapper">
+            {testimonials.map((t) => (
+              <div className="swiper-slide" key={t.id}>
+                <div className="testimonial-item area-effect">
+                  <div className="icon">
+                    <i className="icon-quote"></i>
+                  </div>
+                  <p className="text-body-2 text_white mb_21">{t.quote}</p>
+                  <div className="athor">
+                    <h5 className="name text_white mb_4 font-4">
+                      <a href="#" className="link">
+                        {t.name}
+                      </a>
+                    </h5>
+                    <span className="text-label text-uppercase text_primary-color font-3">
+                      {t.title}
+                    </span>
+                  </div>
+                  <div className="item-shape spotlight">
+                    <img
+                      src={smallCometWebp}
+                      loading="lazy"
+                      decoding="async"
+                      alt="item"
+                    />
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+          <div className="wrap-sw-button d-flex gap_12 ">
+            <div className="sw-button sw-single-prev ">
+              <i className="icon-CaretLeft"></i>
             </div>
-          ))}
-        </div>
-        <div className="wrap-sw-button d-flex gap_12 ">
-          <div className="sw-button sw-single-prev ">
-            <i className="icon-CaretLeft"></i>
-          </div>
-          <div className="sw-button sw-single-next ">
-            <i className="icon-CaretRight"></i>
+            <div className="sw-button sw-single-next ">
+              <i className="icon-CaretRight"></i>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

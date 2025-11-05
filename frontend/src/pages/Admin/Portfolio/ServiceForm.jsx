@@ -11,16 +11,6 @@ const ServiceForm = ({ formData, setFormData }) => {
   return (
     <>
       <div className="admin-form-group">
-        <label className="admin-form-label">Number</label>
-        <input
-          type="text"
-          className="admin-form-input"
-          value={formData.number || ""}
-          onChange={(e) => setFormData({ ...formData, number: e.target.value })}
-          placeholder="e.g., 01/"
-        />
-      </div>
-      <div className="admin-form-group">
         <label className="admin-form-label">Title *</label>
         <input
           type="text"
@@ -43,17 +33,6 @@ const ServiceForm = ({ formData, setFormData }) => {
             Current: {formData.image}
           </p>
         )}
-      </div>
-      <div className="admin-form-group">
-        <label className="admin-form-label">Description</label>
-        <textarea
-          className="admin-form-textarea"
-          value={formData.description || ""}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          rows={3}
-        />
       </div>
       <div className="admin-form-group">
         <label className="admin-form-label">Order</label>

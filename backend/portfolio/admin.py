@@ -4,9 +4,15 @@ from .models import About, ResumeItem, Service, Skill, Testimonial, SocialMediaL
 
 @admin.register(About)
 class AboutAdmin(admin.ModelAdmin):
-    list_display = ['name', 'title', 'email', 'location', 'created_at']
+    list_display = ['name', 'title', 'email', 'location', 'has_cv', 'created_at']
     search_fields = ['name', 'title', 'email']
     list_filter = ['created_at', 'updated_at']
+    
+    def has_cv(self, obj):
+        """Display whether CV is uploaded"""
+        return bool(obj.cv)
+    has_cv.short_description = 'CV Uploaded'
+    has_cv.boolean = True
 
 
 @admin.register(ResumeItem)
@@ -19,7 +25,7 @@ class ResumeItemAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ['title', 'number', 'is_active', 'order', 'created_at']
+    list_display = ['title', 'is_active', 'order', 'created_at']
     list_filter = ['is_active', 'created_at']
     search_fields = ['title']
     ordering = ['order', 'created_at']

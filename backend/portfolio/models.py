@@ -16,6 +16,7 @@ class About(models.Model):
     projects_completed = models.IntegerField(default=1000)
     email = models.EmailField()
     location = models.CharField(max_length=100)
+    cv = models.FileField(upload_to='cv/', blank=True, null=True, help_text="CV/Resume PDF file")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -53,10 +54,8 @@ class ResumeItem(models.Model):
 
 class Service(models.Model):
     """Services offered"""
-    number = models.CharField(max_length=20, help_text="e.g., '01/'")
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='services/', help_text="Service icon/image")
-    description = models.TextField(blank=True)
     order = models.IntegerField(default=0, help_text="Display order (lower appears first)")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

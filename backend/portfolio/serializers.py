@@ -5,6 +5,16 @@ from .models import (
 
 
 class AboutSerializer(serializers.ModelSerializer):
+    cv = serializers.FileField(required=False, allow_null=True)
+    
+    def to_internal_value(self, data):
+        # Remove cv field if it's a string (existing URL from frontend)
+        if hasattr(data, 'get') and data.get('cv') and isinstance(data.get('cv'), str):
+            data = data.copy()
+            if 'cv' in data:
+                del data['cv']
+        return super().to_internal_value(data)
+    
     class Meta:
         model = About
         fields = '__all__'

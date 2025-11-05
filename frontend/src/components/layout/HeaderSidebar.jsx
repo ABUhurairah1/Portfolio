@@ -1,19 +1,41 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import avatarImage from "../../assets/images/user/avatar-2.webp";
+import { getAboutList } from "../../apis";
 
-const HeaderSidebar = () => (
-  <div className="header-sidebar style-horizontal bs-light-mode">
-    <div className="box">
-      <div className="avatar">
-        <img src={avatarImage} width="68" height="68" alt="avatar" />
-      </div>
-      <div className="info">
-        <h6 className="font-4 mb_4">ZenG</h6>
-        <div className="text-label text-uppercase fw-6 text_primary-color font-3 letter-spacing-1">
-          AI Developer
+const HeaderSidebar = () => {
+  const [aboutData, setAboutData] = useState(null);
+
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const response = await getAboutList();
+        if (response.success && response.data) {
+          setAboutData(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch about data:", error);
+      }
+    };
+
+    fetchAboutData();
+  }, []);
+
+  const name = aboutData?.name || "User";
+  const title = aboutData?.title || "Developer";
+
+  return (
+    <div className="header-sidebar style-horizontal bs-light-mode">
+      <div className="box">
+        <div className="avatar">
+          <img src={avatarImage} width="68" height="68" alt="avatar" />
+        </div>
+        <div className="info">
+          <h6 className="font-4 mb_4">{name}</h6>
+          <div className="text-label text-uppercase fw-6 text_primary-color font-3 letter-spacing-1">
+            {title}
+          </div>
         </div>
       </div>
-    </div>
     <ul className="nav-menu style-2 list-icon ">
       <li>
         <a className="nav_link active" href="#about">
@@ -59,10 +81,11 @@ const HeaderSidebar = () => (
     >
       <i className="icon-CirclesFour"></i>
     </a>
-    <div id="menu-2" className="popup-menu-mobile">
-      {/* ...mobile menu structure... */}
+      <div id="menu-2" className="popup-menu-mobile">
+        {/* ...mobile menu structure... */}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default HeaderSidebar;
